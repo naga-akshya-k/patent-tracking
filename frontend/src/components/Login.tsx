@@ -140,27 +140,15 @@ export const Login: React.FC = () => {
 
           </form>
 
-          {/* Super-admin quick login for demo */}
+          {/* Admin quick login for demo */}
           <div className="pt-4 border-t border-slate-650 flex flex-col gap-2">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center">
-              Quick Admin Access
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="py-1 px-2 text-[10px] font-bold rounded bg-slate-950/40 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-900/50 transition-colors"
-              >
-                Admin Office
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('iqac')}
-                className="py-1 px-2 text-[10px] font-bold rounded bg-slate-950/40 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-900/50 transition-colors"
-              >
-                Auditor View
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleQuickLogin('admin')}
+              className="w-full py-2 text-xs font-bold rounded bg-slate-950/40 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-900/50 transition-colors tracking-wide uppercase"
+            >
+              Demo Login (Admin Office)
+            </button>
           </div>
 
         </div>

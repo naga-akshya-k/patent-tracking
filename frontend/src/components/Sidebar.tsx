@@ -52,11 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'super_admin': return 'Super Admin';
-      case 'department_coordinator': return 'Dept Coordinator';
-      case 'faculty_inventor': return 'Faculty Inventor';
-      case 'management_viewer': return 'Management Auditor';
-      default: return role;
+      case 'super_admin': return 'Admin Office';
+      default: return 'Admin Office';
     }
   };
 

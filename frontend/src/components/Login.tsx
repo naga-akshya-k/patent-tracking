@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Eye, Lock, ArrowRight, User as UserIcon } from 'lucide-react';
+import eecCampus from '../assets/eec_campus.jpg';
+import eecLogo from '../assets/eec_logo.png';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -54,26 +56,19 @@ export const Login: React.FC = () => {
   return (
     <div 
       className="min-h-screen flex flex-col justify-between relative overflow-hidden bg-cover bg-center select-none"
-      style={{ backgroundImage: `url('/eec_campus.jpg')` }}
+      style={{ backgroundImage: `url(${eecCampus})` }}
     >
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-slate-950/20 backdrop-brightness-[0.85] pointer-events-none"></div>
 
-      {/* Top College Header */}
-      <header className="z-10 text-center pt-10 px-4">
-        <h1 className="text-white text-xl md:text-3xl font-extrabold tracking-[0.25em] font-sans drop-shadow-md">
-          EASWARI ENGINEERING COLLEGE
-        </h1>
-      </header>
-
       {/* Central Login Card Container */}
-      <main className="z-10 flex items-center justify-center px-4 py-8">
+      <main className="z-10 flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-[390px] bg-[#1a2f42]/75 backdrop-blur-[6px] border border-slate-700/35 rounded-lg p-6 md:p-8 shadow-2xl flex flex-col gap-4 text-left">
           
           {/* Logo and Subtitle */}
           <div className="text-center">
             <img 
-              src="/eec_logo.png" 
+              src={eecLogo} 
               alt="Easwari Engineering College Logo" 
               className="w-28 h-28 mx-auto object-contain bg-white rounded-full p-0.5"
             />
@@ -83,7 +78,7 @@ export const Login: React.FC = () => {
           </div>
 
           {error && (
-            <div className="p-3 rounded bg-red-950/40 border border-red-800/50 text-red-200 text-xs">
+            <div className="p-3 rounded bg-red-950/40 border border-red-800/50 text-red-200 text-xs text-center">
               {error}
             </div>
           )}

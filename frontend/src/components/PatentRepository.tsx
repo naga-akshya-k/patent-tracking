@@ -231,18 +231,6 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
           <p className="text-slate-600 text-sm mt-1">Search, update, and audit institutional patent portfolios</p>
         </div>
 
-        {user?.role !== 'management_viewer' && (
-          <button
-            onClick={() => {
-              setDeptId(user.department_id || '');
-              setShowAddModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-brand-500/15 active:scale-[0.98] transition-all text-sm"
-          >
-            <Plus size={16} />
-            <span>Identify New Patent</span>
-          </button>
-        )}
       </div>
 
       {/* Sub-view Toggles (Overall vs Department-Wise) */}

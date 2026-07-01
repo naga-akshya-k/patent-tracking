@@ -58,23 +58,33 @@ export const Login: React.FC = () => {
       className="min-h-screen flex flex-col justify-between relative overflow-hidden bg-cover bg-center select-none"
       style={{ backgroundImage: `url(${eecCampus})` }}
     >
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-slate-950/20 backdrop-brightness-[0.85] pointer-events-none"></div>
-
       {/* Central Login Card Container */}
-      <main className="z-10 flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-[390px] bg-[#1a2f42]/75 backdrop-blur-[6px] border border-slate-700/35 rounded-lg p-6 md:p-8 shadow-2xl flex flex-col gap-4 text-left">
+      <main className="z-10 flex-1 flex items-center justify-center px-4 pt-32 pb-8">
+        <div 
+          className="w-full max-w-[390px] border border-slate-700/20 rounded-lg p-6 md:p-8 shadow-2xl flex flex-col gap-4 text-left relative"
+          style={{ backgroundColor: 'rgba(40, 55, 65, 0.52)' }}
+        >
           
-          {/* Logo and Subtitle */}
-          <div className="text-center">
+          {/* Logo and Subtitle Box (Square White Container Overlay) */}
+          <div 
+            className="bg-white flex flex-col items-center justify-center"
+            style={{ 
+              width: '180px', 
+              height: '180px', 
+              margin: '-115px auto 15px auto', // Centered overlay on top card border
+              border: 'none',
+              borderRadius: '0',
+              boxShadow: 'none',
+              boxSizing: 'border-box',
+              padding: '4px',
+              zIndex: 20
+            }}
+          >
             <img 
               src={eecLogo} 
               alt="Easwari Engineering College Logo" 
-              className="w-28 h-28 mx-auto object-contain bg-white rounded-full p-0.5"
+              className="h-[172px] w-[172px] object-contain"
             />
-            <span className="block text-[11px] font-extrabold text-slate-300 tracking-[0.3em] uppercase mt-2">
-              AUTONOMOUS
-            </span>
           </div>
 
           {error && (
@@ -87,7 +97,10 @@ export const Login: React.FC = () => {
             
             {/* Username Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-white tracking-wide">
+              <label 
+                className="text-xs font-semibold tracking-wide"
+                style={{ color: '#ffffff' }}
+              >
                 Username or Email
               </label>
               <input
@@ -103,13 +116,17 @@ export const Login: React.FC = () => {
             {/* Password Input */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-semibold text-white tracking-wide">
+                <label 
+                  className="text-xs font-semibold tracking-wide"
+                  style={{ color: '#ffffff' }}
+                >
                   Password
                 </label>
                 <a 
                   href="#forgot" 
                   onClick={(e) => { e.preventDefault(); alert("Please contact the Admin Office to reset credentials."); }}
-                  className="text-[11px] text-slate-300 hover:text-white transition-colors"
+                  className="text-[11px] hover:text-slate-200 transition-colors font-bold"
+                  style={{ color: '#ffffff' }}
                 >
                   Forgot your password?
                 </a>
@@ -140,7 +157,8 @@ export const Login: React.FC = () => {
             <button
               type="button"
               onClick={() => handleQuickLogin('admin')}
-              className="w-full py-2 text-xs font-bold rounded bg-slate-950/40 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-900/50 transition-colors tracking-wide uppercase"
+              className="w-full py-2.5 text-xs font-bold rounded border border-slate-300 hover:bg-slate-200 transition-all tracking-wide uppercase shadow"
+              style={{ color: '#000000', backgroundColor: '#f8fafc' }}
             >
               Demo Login (Admin Office)
             </button>
@@ -148,14 +166,6 @@ export const Login: React.FC = () => {
 
         </div>
       </main>
-
-      {/* Footer copyright */}
-      <footer className="z-10 text-center pb-4 px-4">
-        <p className="text-white/60 text-xs font-semibold drop-shadow-sm font-sans tracking-wide">
-          © Heraizen Technologies Pvt. Ltd.
-        </p>
-      </footer>
-
     </div>
   );
 };

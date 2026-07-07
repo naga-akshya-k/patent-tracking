@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api, type Patent, type Department, type User, type Inventor } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { Loader } from './Loader';
 import { 
   Search, 
   Plus, 
@@ -54,6 +55,7 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedDept, setSelectedDept] = useState<number | ''>('');
   const [selectedDomain, setSelectedDomain] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
   const [loading, setLoading] = useState(true);
   
   // Modal States
@@ -221,26 +223,34 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
     }
   };
 
+  const filteredPatents = patents.filter(pat => {
+    if (!selectedYear) return true;
+    const patentYear = pat.filing_date 
+      ? new Date(pat.filing_date).getFullYear().toString() 
+      : new Date(pat.created_at).getFullYear().toString();
+    return patentYear === selectedYear;
+  });
+
   return (
     <div className="space-y-6 animate-fadeIn">
       
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold font-display text-slate-900">Patent Tracking Registry</h2>
-          <p className="text-slate-600 text-sm mt-1">Search, update, and audit institutional patent portfolios</p>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Patent Repository</h2>
+          <p className="text-slate-500 text-sm mt-1">Search, update, and audit patent portfolios</p>
         </div>
 
       </div>
 
       {/* Sub-view Toggles (Overall vs Department-Wise) */}
-      <div className="flex bg-slate-200/60 p-1 rounded-lg border border-slate-350 w-fit no-print">
+      <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 w-fit no-print">
         <button
           onClick={() => setSubView('overall')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
             subView === 'overall' 
-              ? 'bg-brand-600 text-white shadow-md' 
-              : 'text-slate-600 hover:text-brand-600'
+              ? 'bg-brand-500 text-white shadow-sm' 
+              : 'text-slate-600 hover:text-brand-650'
           }`}
         >
           <Database size={14} />
@@ -250,8 +260,8 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
           onClick={() => setSubView('department')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
             subView === 'department' 
-              ? 'bg-brand-600 text-white shadow-md' 
-              : 'text-slate-600 hover:text-brand-600'
+              ? 'bg-brand-500 text-white shadow-sm' 
+              : 'text-slate-600 hover:text-brand-650'
           }`}
         >
           <Building size={14} />
@@ -262,16 +272,16 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
       {subView === 'overall' ? (
         <>
           {/* Overall Filter Panel */}
-          <div className="glass-panel p-5 rounded-xl border border-slate-800/80 space-y-4">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               {/* Search bar */}
               <div className="relative w-full md:flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-slate-800/80 focus:border-brand-500 rounded-lg pl-11 pr-4 py-2.5 text-white text-sm placeholder-slate-500 outline-none transition-colors"
+                  className="w-full bg-white border border-slate-200 focus:border-brand-500 rounded-lg pl-11 pr-4 py-2.5 text-slate-800 text-sm placeholder-slate-400 outline-none transition-colors shadow-sm"
                   placeholder="Search by patent title, application number, or inventor name..."
                 />
               </div>
@@ -283,7 +293,7 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
                     <select
                       value={selectedDept}
                       onChange={(e) => setSelectedDept(e.target.value === '' ? '' : Number(e.target.value))}
-                      className="w-full bg-slate-950/50 border border-slate-800/80 focus:border-brand-500 text-slate-350 text-sm rounded-lg px-3.5 py-2.5 outline-none appearance-none cursor-pointer"
+                      className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-sm rounded-lg px-3.5 py-2.5 outline-none appearance-none cursor-pointer shadow-sm"
                     >
                       <option value="">All Departments</option>
                       {departments.map((d) => (
@@ -293,12 +303,29 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
                   </div>
                 ) : null}
 
+                {/* Year Filter */}
+                <div className="relative w-full sm:w-48">
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-sm rounded-lg px-3.5 py-2.5 outline-none appearance-none cursor-pointer shadow-sm"
+                  >
+                    <option value="">All Years</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                  </select>
+                </div>
+
                 {/* Domain Filter */}
                 <div className="relative w-full sm:w-48">
                   <select
                     value={selectedDomain}
                     onChange={(e) => setSelectedDomain(e.target.value)}
-                    className="w-full bg-slate-950/50 border border-slate-800/80 focus:border-brand-500 text-slate-350 text-sm rounded-lg px-3.5 py-2.5 outline-none appearance-none cursor-pointer"
+                    className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-sm rounded-lg px-3.5 py-2.5 outline-none appearance-none cursor-pointer shadow-sm"
                   >
                     <option value="">All Domains</option>
                     {DOMAINS.map((dm, idx) => (
@@ -310,14 +337,14 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
             </div>
 
             {/* Status Scrollable Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 border-t border-slate-200 pt-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 border-t border-slate-100 pt-4">
               {STATUS_STAGES.map((st) => (
                 <button
                   key={st}
                   onClick={() => setSelectedStatus(st)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
                     selectedStatus === st
-                      ? 'bg-brand-500/10 border-brand-500/40 text-brand-500 font-extrabold shadow-sm'
+                      ? 'bg-brand-50 border-brand-200 text-brand-600 font-bold shadow-sm'
                       : 'bg-transparent border-transparent text-slate-500 hover:text-brand-500'
                   }`}
                 >
@@ -327,19 +354,17 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
             </div>
           </div>
 
-          {/* Table Output */}
           {loading ? (
-            <div className="flex items-center justify-center h-60">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-500"></div>
-            </div>
-          ) : patents.length > 0 ? (
-            <div className="glass-panel rounded-xl border border-slate-800/80 overflow-hidden">
+            <Loader />
+          ) : filteredPatents.length > 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-left text-sm text-slate-700">
-                  <thead className="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-600">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
                     <tr>
                       <th className="py-4 px-6">Patent Details</th>
                       <th className="py-4 px-6 hidden sm:table-cell">Dept</th>
+                      <th className="py-4 px-6 hidden sm:table-cell">Year</th>
                       <th className="py-4 px-6 hidden md:table-cell">Tech Domain</th>
                       <th className="py-4 px-6">Filing Code</th>
                       <th className="py-4 px-6">Status</th>
@@ -347,7 +372,7 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-700">
-                    {patents.map((pat) => (
+                    {filteredPatents.map((pat) => (
                       <tr 
                         key={pat.id} 
                         className="hover:bg-slate-100/50 cursor-pointer transition-colors"
@@ -367,6 +392,9 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
                           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-500">
                             {departments.find(d => d.id === pat.department_id)?.code || 'CSE'}
                           </div>
+                        </td>
+                        <td className="py-4 px-6 hidden sm:table-cell text-slate-600 text-xs font-semibold">
+                          {pat.filing_date ? new Date(pat.filing_date).getFullYear() : new Date(pat.created_at).getFullYear()}
                         </td>
                         <td className="py-4 px-6 hidden md:table-cell text-slate-600 text-xs">
                           {pat.domain || 'Unassigned'}
@@ -421,16 +449,16 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
             const other = total - (idea + draft + filed + exam + granted);
 
             return (
-              <div key={dept.id} className="glass-panel p-6 rounded-xl border border-slate-200 shadow space-y-5">
+              <div key={dept.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5 hover:shadow-md transition-shadow duration-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 font-display">{dept.name}</h3>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-600 mt-1.5">
+                    <h3 className="text-lg font-bold text-slate-900 font-sans">{dept.name}</h3>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-650 mt-1.5">
                       {dept.code} Department
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-3xl font-black text-slate-950 font-display">{total}</span>
+                    <span className="text-3xl font-bold text-slate-900 font-sans">{total}</span>
                     <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider mt-0.5">Total Patents</span>
                   </div>
                 </div>
@@ -501,16 +529,16 @@ export const PatentRepository: React.FC<PatentRepositoryProps> = ({ onSelectPate
 
       {/* Create Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="glass-panel w-full max-w-3xl rounded-xl border border-slate-800 p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 overflow-y-auto no-print">
+          <div className="bg-white w-full max-w-3xl rounded-2xl border border-slate-200 shadow-xl p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-xl font-bold font-display text-slate-900">Identify New Patent Proposal</h3>
-                <p className="text-slate-600 text-xs mt-1">Initiate a patent record for institutional tracking</p>
+                <h3 className="text-xl font-bold text-slate-950 font-sans">Identify New Patent Proposal</h3>
+                <p className="text-slate-500 text-xs mt-1">Initiate a patent record for tracking</p>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-500 text-xs"
+                className="p-1 rounded bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-500 text-xs"
               >
                 ✕
               </button>

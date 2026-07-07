@@ -14,17 +14,27 @@ import {
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
+  theme: { primary: string; secondary: string };
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  activeTab, 
+  setActiveTab,
+  isCollapsed,
+  setIsCollapsed,
+  theme
+}) => {
   const { user, logout } = useAuth();
+  const [isHovered, setIsHovered] = React.useState(false);
 
   if (!user) return null;
 
   const menuItems = [
     {
       id: 'overview',
-      label: 'Overview Dashboard',
+      label: 'Dashboard',
       icon: LayoutDashboard,
       roles: ['super_admin', 'department_coordinator', 'faculty_inventor', 'management_viewer']
     },
@@ -36,13 +46,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     },
     {
       id: 'analytics',
-      label: 'Analytics & AI Insights',
+      label: 'Analytics',
       icon: Brain,
       roles: ['super_admin', 'department_coordinator', 'faculty_inventor', 'management_viewer']
     },
     {
       id: 'reports',
-      label: 'Reports & Accreditation',
+      label: 'Reports',
       icon: FileSpreadsheet,
       roles: ['super_admin', 'department_coordinator', 'management_viewer']
     }
@@ -50,33 +60,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
 
   const allowedItems = menuItems.filter(item => item.roles.includes(user.role));
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'super_admin': return 'Admin Office';
-      default: return 'Admin Office';
-    }
-  };
+  const isExpanded = !isCollapsed || isHovered;
 
   return (
-    <aside className="w-64 glass-panel border-r border-slate-800/80 flex flex-col h-screen sticky top-0">
+    <aside 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ 
+        backgroundColor: theme.secondary, 
+        height: 'calc(100vh - 3.5rem)', 
+        minHeight: '100%',
+        width: isExpanded ? '260px' : '64px',
+        transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        flexShrink: 0
+      }} 
+      className="flex flex-col border-r border-slate-800/20 select-none overflow-hidden"
+    >
       
-      {/* Brand logo */}
-      <div className="p-6 border-b border-slate-800/80">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/25">
-            <Sparkles size={18} className="text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg font-display text-slate-900 tracking-wide leading-none">PatentPulse</h1>
-            <span className="text-[10px] text-brand-500 font-semibold uppercase tracking-wider mt-1 block">
-              AI-Intelligence
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Navigation Links */}
-      <nav className="flex-1 px-4 py-6 space-y-1.5">
+      <nav className="flex-1 px-2.5 py-6 space-y-2">
         {allowedItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -86,43 +88,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
               onClick={() => {
                 setActiveTab(item.id);
               }}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
+              className={`w-full flex items-center rounded text-sm font-semibold transition-all ${
+                isExpanded 
+                  ? 'px-3 py-3 gap-3.5 justify-start' 
+                  : 'p-3 justify-center'
+              } ${
                 isActive 
-                  ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/10' 
-                  : 'text-slate-600 hover:text-brand-600 hover:bg-slate-100'
+                  ? 'bg-white/15 border-l-4 border-sky-400' 
+                  : 'hover:bg-white/5'
               }`}
+              style={{ color: isActive ? '#ffffff' : '#cbd5e1' }}
+              title={!isExpanded ? item.label : undefined}
             >
-              <Icon size={18} className={isActive ? 'text-white' : 'text-slate-500'} />
-              <span>{item.label}</span>
+              <Icon size={18} style={{ color: isActive ? '#38bdf8' : '#cbd5e1' }} className="flex-shrink-0" />
+              {isExpanded && (
+                <span 
+                  style={{ color: isActive ? '#ffffff' : '#cbd5e1' }}
+                  className="font-semibold text-sm whitespace-nowrap animate-fadeIn"
+                >
+                  {item.label}
+                </span>
+              )}
             </button>
           );
         })}
       </nav>
-
-      {/* User Info & Logout */}
-      <div className="p-4 border-t border-slate-850 bg-slate-50/50">
-        <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-100 border border-slate-200 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-slate-350">
-            <UserIcon size={20} className="text-slate-500" />
-          </div>
-          <div className="overflow-hidden min-w-0">
-            <h4 className="text-sm font-bold text-slate-900 truncate leading-tight">
-              {user.full_name}
-            </h4>
-            <span className="text-[10px] font-semibold text-slate-500 block truncate mt-0.5">
-              {getRoleLabel(user.role)}
-            </span>
-          </div>
-        </div>
-
-        <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-600 hover:text-red-600 hover:border-red-350 hover:bg-red-50 transition-all"
-        >
-          <LogOut size={14} />
-          <span>Sign Out Portal</span>
-        </button>
-      </div>
 
     </aside>
   );

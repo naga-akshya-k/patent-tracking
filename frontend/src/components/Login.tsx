@@ -69,9 +69,9 @@ export const Login: React.FC = () => {
           <div 
             className="bg-white flex flex-col items-center justify-center"
             style={{ 
-              width: '180px', 
-              height: '180px', 
-              margin: '-115px auto 15px auto', // Centered overlay on top card border
+              width: '140px', 
+              height: '140px', 
+              margin: '-95px auto 15px auto', // Centered overlay on top card border
               border: 'none',
               borderRadius: '0',
               boxShadow: 'none',
@@ -83,7 +83,7 @@ export const Login: React.FC = () => {
             <img 
               src={eecLogo} 
               alt="Easwari Engineering College Logo" 
-              className="h-[172px] w-[172px] object-contain"
+              className="h-[132px] w-[132px] object-contain"
             />
           </div>
 

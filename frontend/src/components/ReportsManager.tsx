@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api, type Patent, type Department } from '../services/api';
+import { Loader } from './Loader';
 import { 
   FileSpreadsheet, 
   Download, 
@@ -132,15 +133,15 @@ export const ReportsManager: React.FC = () => {
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 no-print">
         <div>
-          <h2 className="text-3xl font-extrabold font-display text-white">Accreditation Report Center</h2>
-          <p className="text-slate-400 text-sm mt-1">Export structured statistics and tables for NIRF, NAAC Criteria 3, and NBA audits</p>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Reports</h2>
+          <p className="text-slate-500 text-sm mt-1">Export structured statistics and tables for NIRF, NAAC, and NBA audits</p>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={handleExportCSV}
             disabled={patents.length === 0}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-350 hover:text-white transition-all text-xs font-semibold disabled:opacity-40 disabled:pointer-events-none"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 transition-all text-xs font-semibold text-white disabled:opacity-40 disabled:pointer-events-none shadow-sm"
           >
             <Download size={14} />
             <span>Export CSV / Excel</span>
@@ -148,7 +149,7 @@ export const ReportsManager: React.FC = () => {
           <button
             onClick={handlePrint}
             disabled={patents.length === 0}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-350 hover:text-white transition-all text-xs font-semibold disabled:opacity-40 disabled:pointer-events-none"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all text-xs font-semibold disabled:opacity-40 disabled:pointer-events-none shadow-sm"
           >
             <Printer size={14} />
             <span>Print PDF</span>
@@ -157,7 +158,7 @@ export const ReportsManager: React.FC = () => {
       </div>
 
       {/* Filter Builder Panel */}
-      <div className="glass-panel p-5 rounded-xl border border-slate-800/80 space-y-4 no-print">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 no-print">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Report Type Selector */}
@@ -166,10 +167,10 @@ export const ReportsManager: React.FC = () => {
             <select
               value={reportType}
               onChange={(e) => setReportType(e.target.value as any)}
-              className="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 text-slate-300 text-xs rounded-lg px-3 py-2.5 outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-xs rounded-lg px-3 py-2.5 outline-none shadow-sm shadow-black/5"
             >
               <option value="nirf">NIRF Patent Metrics</option>
-              <option value="naac">NAAC Criteria 3.4.3 Format</option>
+              <option value="naac">NAAC Criteria Format</option>
               <option value="nba">NBA Departmental Innovation Audits</option>
             </select>
           </div>
@@ -180,7 +181,7 @@ export const ReportsManager: React.FC = () => {
             <select
               value={deptId}
               onChange={(e) => setDeptId(e.target.value === '' ? '' : Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 text-slate-300 text-xs rounded-lg px-3 py-2.5 outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-xs rounded-lg px-3 py-2.5 outline-none shadow-sm shadow-black/5"
             >
               <option value="">All Departments</option>
               {departments.map((d) => (
@@ -195,7 +196,7 @@ export const ReportsManager: React.FC = () => {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 text-slate-300 text-xs rounded-lg px-3 py-2.5 outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-xs rounded-lg px-3 py-2.5 outline-none shadow-sm shadow-black/5"
             >
               <option value="All">All Years</option>
               <option value="2026">2026</option>
@@ -213,7 +214,7 @@ export const ReportsManager: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 text-slate-300 text-xs rounded-lg px-3 py-2.5 outline-none"
+              className="w-full bg-white border border-slate-200 focus:border-brand-500 text-slate-700 text-xs rounded-lg px-3 py-2.5 outline-none shadow-sm shadow-black/5"
             >
               <option value="All">All Statuses</option>
               <option value="Granted">Granted</option>
@@ -226,29 +227,26 @@ export const ReportsManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Printable Report Output Panel */}
       {loading ? (
-        <div className="flex items-center justify-center h-60 no-print">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-500"></div>
-        </div>
+        <Loader />
       ) : patents.length > 0 ? (
-        <div className="glass-panel p-6 rounded-xl border border-slate-800/80 space-y-6 bg-slate-900/40">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-6 shadow-sm shadow-black/5">
           
           {/* Report Metadata Block */}
-          <div className="border-b border-slate-800/80 pb-6 text-center sm:text-left flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="border-b border-slate-100 pb-6 text-center sm:text-left flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h3 className="text-xl font-bold font-display text-white">
+              <h3 className="text-xl font-bold font-sans text-slate-900">
                 {reportType === 'nirf' ? 'NIRF Data Summary Report: Intellectual Property Rights' :
-                 reportType === 'naac' ? 'NAAC Criteria 3.4.3: Patents Published / Awarded' :
+                 reportType === 'naac' ? 'NAAC Criteria: Patents Published / Awarded' :
                  'NBA Departmental Innovation Performance Report'}
               </h3>
               <p className="text-slate-500 text-xs mt-1">
-                Generated from PatentPulse Repository on {new Date().toLocaleDateString()}
+                Generated from Patent Repository on {new Date().toLocaleDateString()}
               </p>
             </div>
             
-            <div className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-400">
-              Matches Found: <span className="text-white font-bold">{patents.length}</span>
+            <div className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-500">
+              Matches Found: <span className="text-slate-800 font-bold">{patents.length}</span>
             </div>
           </div>
 
@@ -257,7 +255,7 @@ export const ReportsManager: React.FC = () => {
             {reportType === 'nirf' && (
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-950/40 font-bold text-slate-400">
+                  <tr className="border-b border-slate-200 bg-slate-50 font-bold text-slate-555">
                     <th className="py-3 px-4">Filing Year</th>
                     <th className="py-3 px-4">Patent Title</th>
                     <th className="py-3 px-4">Application No.</th>
@@ -268,11 +266,11 @@ export const ReportsManager: React.FC = () => {
                     <th className="py-3 px-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40 text-slate-300">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {patents.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-800/10">
+                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-3 px-4 font-semibold">{p.filing_date ? new Date(p.filing_date).getFullYear() : 'N/A'}</td>
-                      <td className="py-3 px-4 font-bold text-white max-w-xs truncate">{p.title}</td>
+                      <td className="py-3 px-4 font-bold text-slate-900 max-w-xs truncate">{p.title}</td>
                       <td className="py-3 px-4 font-mono">{p.application_number || 'N/A'}</td>
                       <td className="py-3 px-4">{p.filing_date || 'N/A'}</td>
                       <td className="py-3 px-4">{p.publication_date || 'N/A'}</td>
@@ -288,7 +286,7 @@ export const ReportsManager: React.FC = () => {
             {reportType === 'naac' && (
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-950/40 font-bold text-slate-400">
+                  <tr className="border-b border-slate-200 bg-slate-50 font-bold text-slate-555">
                     <th className="py-3 px-4">Patent Number / Application Number</th>
                     <th className="py-3 px-4">Title of the Patent</th>
                     <th className="py-3 px-4">Name of Patenter / Inventor(s)</th>
@@ -296,14 +294,14 @@ export const ReportsManager: React.FC = () => {
                     <th className="py-3 px-4 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40 text-slate-300">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {patents.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-800/10">
-                      <td className="py-3.5 px-4 font-mono font-bold text-white">{p.grant_number || p.application_number || 'N/A'}</td>
-                      <td className="py-3.5 px-4 max-w-xs leading-relaxed">{p.title}</td>
-                      <td className="py-3.5 px-4 text-slate-400 italic">Tagged Inventors available in details</td>
+                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.grant_number || p.application_number || 'N/A'}</td>
+                      <td className="py-3.5 px-4 max-w-xs leading-relaxed text-slate-800 font-semibold">{p.title}</td>
+                      <td className="py-3.5 px-4 text-slate-500 italic">Tagged Inventors available in details</td>
                       <td className="py-3.5 px-4 text-center">{p.filing_date ? new Date(p.filing_date).getFullYear() : 'N/A'}</td>
-                      <td className="py-3.5 px-4 text-center font-bold text-brand-400">{p.status}</td>
+                      <td className="py-3.5 px-4 text-center font-bold text-brand-600">{p.status}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -313,7 +311,7 @@ export const ReportsManager: React.FC = () => {
             {reportType === 'nba' && (
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-950/40 font-bold text-slate-400">
+                  <tr className="border-b border-slate-200 bg-slate-50 font-bold text-slate-555">
                     <th className="py-3 px-4">Department Code</th>
                     <th className="py-3 px-4">Patent Title</th>
                     <th className="py-3 px-4">Filing/Application Code</th>
@@ -321,16 +319,16 @@ export const ReportsManager: React.FC = () => {
                     <th className="py-3 px-4">Audited Verification URL</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40 text-slate-300">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {patents.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-800/10">
-                      <td className="py-3.5 px-4 font-bold text-white">
+                    <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-slate-900">
                         {departments.find(d => d.id === p.department_id)?.code || 'CSE'}
                       </td>
-                      <td className="py-3.5 px-4 max-w-xs leading-relaxed">{p.title}</td>
+                      <td className="py-3.5 px-4 max-w-xs leading-relaxed text-slate-850 font-semibold">{p.title}</td>
                       <td className="py-3.5 px-4 font-mono">{p.application_number || 'N/A'}</td>
                       <td className="py-3.5 px-4 font-semibold">{p.status}</td>
-                      <td className="py-3.5 px-4 text-blue-400 font-mono underline select-all">
+                      <td className="py-3.5 px-4 text-blue-600 font-mono underline select-all">
                         http://localhost:8000/api/patents/{p.id}
                       </td>
                     </tr>
@@ -341,9 +339,9 @@ export const ReportsManager: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center p-16 text-center bg-slate-900/10 rounded-xl border border-slate-800/60 no-print">
-          <FileSpreadsheet size={48} className="text-slate-650 mb-3" />
-          <p className="text-slate-400 text-sm font-semibold">No records match filters</p>
+        <div className="flex flex-col items-center justify-center p-16 text-center bg-slate-50/50 rounded-2xl border border-slate-200 no-print">
+          <FileSpreadsheet size={48} className="text-slate-400 mb-3" />
+          <p className="text-slate-700 text-sm font-semibold">No records match filters</p>
           <p className="text-slate-500 text-xs mt-1">Try expanding the year filters or selecting different statuses.</p>
         </div>
       )}

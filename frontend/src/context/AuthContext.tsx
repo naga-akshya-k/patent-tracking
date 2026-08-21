@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchCurrentUser();
   }, []);
 
-  const login = async (username: str, password: str) => {
+  const login = async (username: string, password: string) => {
     setLoading(true);
     try {
       const response = await api.login(username, password);

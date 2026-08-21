@@ -11,8 +11,8 @@ from app.seed import seed_database
 from app import models
 
 app = FastAPI(
-    title="PatentPulse API",
-    description="Backend API for AI-Powered Institutional Patent Monitoring, Analytics, and Decision Support System",
+    title="Patent Tracking API",
+    description="Backend API for Institutional Patent Monitoring, Analytics, and Decision Support System",
     version="1.0.0"
 )
 
@@ -64,6 +64,6 @@ def startup_event():
 def read_root():
     return {
         "status": "online",
-        "app": "PatentPulse Institutional Patent Monitoring and Analytics System API",
+        "app": "Patent Tracking Institutional Patent Monitoring and Analytics System API",
         "version": "1.0.0"
     }

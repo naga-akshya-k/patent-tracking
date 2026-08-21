@@ -319,7 +319,7 @@ const DashboardContent: React.FC = () => {
         
         {/* Main content wrapper */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50 max-h-[calc(100vh-3.5rem)]">
-          {activeTab === 'overview' && <DashboardOverview />}
+          {activeTab === 'overview' && <DashboardOverview onSelectPatent={handleSelectPatent} />}
           
           {activeTab === 'repository' && (
             selectedPatentId !== null ? (
@@ -329,7 +329,7 @@ const DashboardContent: React.FC = () => {
             )
           )}
           
-          {activeTab === 'analytics' && <AnalyticsDashboard />}
+          {activeTab === 'analytics' && <AnalyticsDashboard onSelectPatent={handleSelectPatent} />}
           
           {activeTab === 'reports' && <ReportsManager />}
         </main>

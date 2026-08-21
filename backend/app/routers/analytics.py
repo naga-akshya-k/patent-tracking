@@ -6,7 +6,7 @@ import datetime
 
 from app.database import get_db
 from app import models, schemas, auth
-from app.ai.ai_engine import forecaster_engine, risk_engine
+from app.ai.ai_engine import risk_engine
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
@@ -56,11 +56,11 @@ def get_yearly_trends(
     # Map database records to a DataFrame for Pandas aggregation
     data = []
     for p in patents:
-        if p.filing_date:
-            data.append({
-                "year": p.filing_date.year,
-                "status": p.status
-            })
+        yr = p.filing_date.year if p.filing_date else (p.created_at.year if p.created_at else 2026)
+        data.append({
+            "year": yr,
+            "status": p.status
+        })
             
     if not data:
         return []
@@ -189,16 +189,7 @@ def get_faculty_rankings(
     rankings.sort(key=lambda x: x["innovation_index"], reverse=True)
     return rankings
 
-@router.get("/ai-forecast", response_model=List[schemas.ForecastItem])
-def get_growth_forecast(
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_user)
-):
-    trends = get_yearly_trends(db, current_user)
-    
-    # Run the forecaster
-    forecast = forecaster_engine.forecast_growth(trends, years_ahead=3)
-    return forecast
+
 
 @router.get("/ai-risks", response_model=List[schemas.RiskDetail])
 def get_ai_risk_dashboard(

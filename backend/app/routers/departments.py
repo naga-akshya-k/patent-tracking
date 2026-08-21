@@ -44,6 +44,7 @@ def get_department_performance(
     patents = db.query(models.Patent).filter(models.Patent.department_id == id).all()
     
     total = len(patents)
+    disclosures = sum(1 for p in patents if p.status in ["Idea Identified", "Draft Preparation"])
     filed = sum(1 for p in patents if p.status == "Patent Filed")
     published = sum(1 for p in patents if p.status == "Published")
     granted = sum(1 for p in patents if p.status == "Granted")
@@ -51,6 +52,10 @@ def get_department_performance(
     rejected = sum(1 for p in patents if p.status == "Rejected")
     abandoned = sum(1 for p in patents if p.status == "Abandoned")
     
+    # Conversion ratio: (Filed + Published + Granted) / total * 100
+    applied_count = filed + published + granted + sum(1 for p in patents if p.status in ["Under Examination", "FER Issued", "FER Responded"])
+    conversion_ratio = (applied_count / total * 100) if total > 0 else 0.0
+
     # Success rate formula: Granted / (Granted + Rejected + Abandoned)
     resolved = granted + rejected + abandoned
     success_rate = (granted / resolved * 100) if resolved > 0 else 0.0
@@ -78,10 +83,12 @@ def get_department_performance(
         "department_name": dept.name,
         "department_code": dept.code,
         "total_patents": total,
+        "disclosures_count": disclosures,
         "filed_patents": filed,
         "published_patents": published,
         "granted_patents": granted,
         "pending_patents": pending,
-        "success_rate": success_rate,
-        "innovation_score": innovation_score
+        "conversion_ratio": round(conversion_ratio, 1),
+        "success_rate": round(success_rate, 1),
+        "innovation_score": round(innovation_score, 1)
     }

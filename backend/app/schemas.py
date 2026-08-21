@@ -167,10 +167,12 @@ class DepartmentPerformance(BaseModel):
     department_name: str
     department_code: str
     total_patents: int
+    disclosures_count: int = 0
     filed_patents: int
     published_patents: int
     granted_patents: int
     pending_patents: int
+    conversion_ratio: float = 0.0
     success_rate: float
     innovation_score: float
 
@@ -191,10 +193,7 @@ class RiskDetail(BaseModel):
     reasons: List[str]
     action_items: List[str]
 
-class ForecastItem(BaseModel):
-    year: int
-    predicted_filings: int
-    predicted_grants: int
+
 
 class AIDomainSuggestion(BaseModel):
     predicted_domain: str

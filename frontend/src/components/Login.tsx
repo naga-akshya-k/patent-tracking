@@ -10,6 +10,7 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [selectedDemoRole, setSelectedDemoRole] = useState('admin');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,18 +30,27 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleQuickLogin = async (role: string) => {
+  const handleQuickLogin = async () => {
     setSubmitting(true);
     setError('');
     
-    let u = '';
-    let p = '';
+    let u = 'admin';
+    let p = 'Admin123!';
     
-    if (role === 'admin') {
+    if (selectedDemoRole === 'admin') {
       u = 'admin';
       p = 'Admin123!';
-    } else {
-      u = 'iqac';
+    } else if (selectedDemoRole === 'coordinator') {
+      u = 'cse_coordinator';
+      p = 'Coord123!';
+    } else if (selectedDemoRole === 'student') {
+      u = 'student';
+      p = 'Student123!';
+    } else if (selectedDemoRole === 'attorney') {
+      u = 'attorney';
+      p = 'Attorney123!';
+    } else if (selectedDemoRole === 'auditor') {
+      u = 'auditor';
       p = 'Iqac123!';
     }
     
@@ -65,13 +75,13 @@ export const Login: React.FC = () => {
           style={{ backgroundColor: 'rgba(40, 55, 65, 0.52)' }}
         >
           
-          {/* Logo and Subtitle Box (Square White Container Overlay) */}
+          {/* Logo and Subtitle Box */}
           <div 
             className="bg-white flex flex-col items-center justify-center"
             style={{ 
               width: '140px', 
               height: '140px', 
-              margin: '-95px auto 15px auto', // Centered overlay on top card border
+              margin: '-95px auto 15px auto',
               border: 'none',
               borderRadius: '0',
               boxShadow: 'none',
@@ -152,15 +162,27 @@ export const Login: React.FC = () => {
 
           </form>
 
-          {/* Admin quick login for demo */}
+          {/* Role-Based Demo Login */}
           <div className="pt-4 border-t border-slate-650 flex flex-col gap-2">
+            <select
+              value={selectedDemoRole}
+              onChange={(e) => setSelectedDemoRole(e.target.value)}
+              className="w-full bg-white text-slate-900 text-xs font-semibold rounded p-2 outline-none border border-slate-300"
+            >
+              <option value="admin">IP Cell Admin (Dr. R. K. Vance)</option>
+              <option value="coordinator">Dept Coordinator (Prof. David Miller)</option>
+              <option value="student">Student Innovator (Aarav Sharma)</option>
+              <option value="attorney">External Attorney (Adv. Rajesh Kumar)</option>
+              <option value="auditor">Management Auditor (Dr. IQAC Lead)</option>
+            </select>
+
             <button
               type="button"
-              onClick={() => handleQuickLogin('admin')}
+              onClick={handleQuickLogin}
               className="w-full py-2.5 text-xs font-bold rounded border border-slate-300 hover:bg-slate-200 transition-all tracking-wide uppercase shadow"
               style={{ color: '#000000', backgroundColor: '#f8fafc' }}
             >
-              Demo Login (Admin Office)
+              Demo Login
             </button>
           </div>
 

@@ -35,7 +35,11 @@ import {
   Legend
 } from 'recharts';
 
-export const DashboardOverview: React.FC = () => {
+interface DashboardOverviewProps {
+  onSelectPatent?: (patentId: number) => void;
+}
+
+export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onSelectPatent }) => {
   const { user } = useAuth();
   const [kpis, setKpis] = useState<KPIStats | null>(null);
   const [yearlyData, setYearlyData] = useState<any[]>([]);
@@ -89,25 +93,29 @@ export const DashboardOverview: React.FC = () => {
     return <Loader />;
   }
 
-  // Mock yearly student vs faculty contribution data matching screenshot's timeline
-  const yearlyContributions = [
-    { year: '2021', Students: 3, Faculty: 1 },
-    { year: '2022', Students: 5, Faculty: 2 },
-    { year: '2023', Students: 8, Faculty: 3 },
-    { year: '2024', Students: 12, Faculty: 4 },
-    { year: '2025', Students: 9, Faculty: 5 },
-    { year: '2026', Students: 11, Faculty: 4 },
-  ];
+  // Compute yearly student filings dynamically from real patents database
+  const yearlyMap: { [key: string]: number } = {};
+  ['2021', '2022', '2023', '2024', '2025', '2026'].forEach(y => {
+    yearlyMap[y] = 0;
+  });
 
-  // Map dynamic department contributions
+  patents.forEach(p => {
+    const yr = p.filing_date 
+      ? new Date(p.filing_date).getFullYear().toString()
+      : (p.created_at ? new Date(p.created_at).getFullYear().toString() : '2026');
+    yearlyMap[yr] = (yearlyMap[yr] || 0) + 1;
+  });
+
+  const yearlyContributions = Object.keys(yearlyMap).sort().map(y => ({
+    year: y,
+    Students: yearlyMap[y]
+  }));
+
+  // Map dynamic department contributions for all 13 departments
   const departmentBreakdown = departments.map((d) => {
     const patentCount = patents.filter(p => p.department_id === d.id).length;
-    let students = 1;
-    let faculty = 1;
-    if (d.code === 'CSE') { students = 5; faculty = 1; }
-    else if (d.code === 'ECE') { students = 4; faculty = 1; }
-    else if (d.code === 'ME') { students = 2; faculty = 1; }
-    else if (d.code === 'BT') { students = 1; faculty = 1; }
+    const students = Math.max(1, patentCount);
+    const faculty = Math.max(1, Math.ceil(patentCount / 2));
 
     return {
       code: d.code,
@@ -115,7 +123,7 @@ export const DashboardOverview: React.FC = () => {
       students,
       faculty,
       patentsCount: patentCount,
-      status: patentCount > 3 ? 'High Output' : 'Active'
+      status: patentCount >= 3 ? 'High Output' : (patentCount > 0 ? 'Active' : 'Initiating')
     };
   });
 
@@ -395,40 +403,97 @@ export const DashboardOverview: React.FC = () => {
 
           {/* Actionable notifications alert panel */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center gap-2">
-              <Bell size={16} className="text-brand-500" />
-              <h3 className="text-sm font-bold font-sans text-slate-900">Actionable Alerts</h3>
-              <span className="px-2 py-0.5 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-[9px] font-bold">
-                {notifications.length} Info
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Bell size={16} className="text-[#6B1D2F]" />
+                <h3 className="text-sm font-bold font-sans text-slate-900">Actionable Alerts</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-[#6B1D2F] text-white text-[9px] font-bold shadow-sm">
+                4 Statutory Alerts
               </span>
             </div>
 
-            {notifications.length > 0 ? (
-              <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                {notifications.slice(0, 3).map((notif) => (
-                  <div 
-                    key={notif.id}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-colors flex justify-between items-start gap-3 text-xs"
-                  >
-                    <div>
-                      <span className="font-bold text-slate-900 block leading-tight">{notif.title}</span>
-                      <p className="text-slate-500 text-[10px] mt-1 leading-normal">{notif.message}</p>
-                    </div>
-                    <button
-                      onClick={() => handleMarkRead(notif.id)}
-                      className="p-1 rounded-full border border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-colors flex-shrink-0"
-                    >
-                      <Check size={12} />
-                    </button>
-                  </div>
-                ))}
+            <div className="space-y-3">
+              {/* Alert 1: FER Deadline (CRITICAL) */}
+              <div className="p-3 rounded-xl bg-red-50/60 border border-red-200 hover:border-red-300 transition-colors space-y-2 text-xs">
+                <div className="flex justify-between items-start gap-2">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-800 border border-red-200">CRITICAL</span>
+                  <span className="text-[10px] font-bold text-red-700">18 days left</span>
+                </div>
+                <span className="font-bold text-slate-900 block leading-snug">FER Response Deadline (6-Month Limit)</span>
+                <p className="text-slate-600 text-[10px] leading-normal">IT: High throughput distributed graph database engine</p>
+                <button
+                  onClick={() => {
+                    const target = patents.find(p => p.department_id === departments.find(d => d.code === 'IT')?.id) || patents[0];
+                    if (target && onSelectPatent) onSelectPatent(target.id);
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-[#6B1D2F] hover:bg-[#800020] text-white text-[11px] font-bold shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Take Action</span>
+                  <ArrowRight size={12} />
+                </button>
               </div>
-            ) : (
-              <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl text-xs font-semibold">
-                <CheckCircle size={14} />
-                <span>Up to date. No warnings.</span>
+
+              {/* Alert 2: Form 18 RFE (WARNING) */}
+              <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200 hover:border-amber-300 transition-colors space-y-2 text-xs">
+                <div className="flex justify-between items-start gap-2">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">WARNING</span>
+                  <span className="text-[10px] font-bold text-amber-700">42 days left</span>
+                </div>
+                <span className="font-bold text-slate-900 block leading-snug">Form 18 RFE (31-Month Window)</span>
+                <p className="text-slate-600 text-[10px] leading-normal">BIOTECH: Continuous enzymatic bioreactor design</p>
+                <button
+                  onClick={() => {
+                    const target = patents.find(p => p.department_id === departments.find(d => d.code === 'BIOTECH')?.id) || patents[0];
+                    if (target && onSelectPatent) onSelectPatent(target.id);
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-[#6B1D2F] hover:bg-[#800020] text-white text-[11px] font-bold shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Take Action</span>
+                  <ArrowRight size={12} />
+                </button>
               </div>
-            )}
+
+              {/* Alert 3: Stalled Review (WARNING) */}
+              <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200 hover:border-amber-300 transition-colors space-y-2 text-xs">
+                <div className="flex justify-between items-start gap-2">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">WARNING</span>
+                  <span className="text-[10px] font-bold text-amber-700">14 days left</span>
+                </div>
+                <span className="font-bold text-slate-900 block leading-snug">Stalled Faculty Review (&gt; 14 Days)</span>
+                <p className="text-slate-600 text-[10px] leading-normal">ECE: Smart automated greenhouse monitoring node</p>
+                <button
+                  onClick={() => {
+                    const target = patents.find(p => p.department_id === departments.find(d => d.code === 'ECE')?.id) || patents[0];
+                    if (target && onSelectPatent) onSelectPatent(target.id);
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-[#6B1D2F] hover:bg-[#800020] text-white text-[11px] font-bold shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Take Action</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              {/* Alert 4: Maintenance Fee (INFO) */}
+              <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 hover:border-emerald-300 transition-colors space-y-2 text-xs">
+                <div className="flex justify-between items-start gap-2">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">INFO</span>
+                  <span className="text-[10px] font-bold text-emerald-700">85 days left</span>
+                </div>
+                <span className="font-bold text-slate-900 block leading-snug">Annual Maintenance / Renewal Fee</span>
+                <p className="text-slate-600 text-[10px] leading-normal">CSE: Machine learning based dynamic load balancer</p>
+                <button
+                  onClick={() => {
+                    const target = patents.find(p => p.department_id === departments.find(d => d.code === 'CSE')?.id) || patents[0];
+                    if (target && onSelectPatent) onSelectPatent(target.id);
+                  }}
+                  className="w-full py-1.5 rounded-lg bg-[#6B1D2F] hover:bg-[#800020] text-white text-[11px] font-bold shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Take Action</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>

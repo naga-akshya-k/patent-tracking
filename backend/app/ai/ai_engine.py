@@ -75,58 +75,7 @@ class AICategorizer:
         return predicted_class, confidence
 
 
-# 2. AI Trend Forecasting Engine
-class AIForecaster:
-    @staticmethod
-    def forecast_growth(historical_filings: List[Dict[str, Any]], years_ahead: int = 3) -> List[Dict[str, Any]]:
-        """
-        Takes list of {'year': int, 'filings': int, 'grants': int}
-        Fits linear trend and projects next years.
-        """
-        if len(historical_filings) < 2:
-            # Fallback if insufficient historical data
-            last_year = historical_filings[-1]['year'] if historical_filings else 2026
-            last_filings = historical_filings[-1]['filings'] if historical_filings else 5
-            last_grants = historical_filings[-1]['grants'] if historical_filings else 1
-            predictions = []
-            for i in range(1, years_ahead + 1):
-                predictions.append({
-                    "year": last_year + i,
-                    "predicted_filings": int(last_filings * (1 + 0.1 * i)),
-                    "predicted_grants": int(last_grants * (1 + 0.08 * i))
-                })
-            return predictions
 
-        df = pd.DataFrame(historical_filings)
-        
-        X = df['year'].values.reshape(-1, 1)
-        y_filings = df['filings'].values
-        y_grants = df['grants'].values
-        
-        # Fit simple trends
-        from sklearn.linear_model import LinearRegression
-        model_filings = LinearRegression().fit(X, y_filings)
-        model_grants = LinearRegression().fit(X, y_grants)
-        
-        last_year = int(df['year'].max())
-        predictions = []
-        
-        for i in range(1, years_ahead + 1):
-            target_year = last_year + i
-            pred_f = model_filings.predict([[target_year]])[0]
-            pred_g = model_grants.predict([[target_year]])[0]
-            
-            # Clamp to positive integers
-            pred_f = max(0, int(round(pred_f)))
-            pred_g = max(0, int(round(pred_g)))
-            
-            predictions.append({
-                "year": target_year,
-                "predicted_filings": pred_f,
-                "predicted_grants": pred_g
-            })
-            
-        return predictions
 
 
 # 3. AI Risk Assessment Engine
@@ -221,5 +170,4 @@ class AIRiskAssessor:
 
 # Instantiate global engines
 categorizer_engine = AICategorizer()
-forecaster_engine = AIForecaster()
 risk_engine = AIRiskAssessor()

@@ -73,9 +73,6 @@ p, .text-slate-400 {
   color: #6B7280 !important; /* text-slate-500 */
 }
 
-
-/* Sidebar Specific Overrides removed to allow custom theme */
-
 aside .bg-slate-900\/30 {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
@@ -214,3 +211,89 @@ table tbody td span.font-semibold, table tbody td span.font-bold {
   animation: spin-counterclockwise 4s linear infinite;
 }
 
+/* ------------------------------------------------------------- */
+/* PRINT STYLESHEET (PDF Export & Print Optimization)            */
+/* ------------------------------------------------------------- */
+@media print {
+  @page {
+    size: portrait;
+    margin: 12mm 15mm;
+  }
+
+  /* Hide app chrome: header bar, sidebar, action buttons, filters */
+  header,
+  aside,
+  .no-print,
+  .no-print * {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+  }
+
+  /* Reset layout containers to allow multi-page document flow */
+  html, 
+  body, 
+  #root, 
+  main, 
+  .printable-area,
+  div {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    position: static !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Printable document styling */
+  .printable-area {
+    display: block !important;
+    padding: 10px !important;
+  }
+
+  .printable-area::before {
+    content: "EASWARI ENGINEERING COLLEGE — OFFICIAL IP & ACCREDITATION REPORT";
+    display: block;
+    text-align: center;
+    font-size: 11pt;
+    font-weight: bold;
+    color: #6B1D2F;
+    border-bottom: 2px solid #6B1D2F;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+}

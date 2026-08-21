@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+const BASE_URL = API_BASE_URL;
 
 export interface User {
   id: number;
@@ -92,10 +93,12 @@ export interface DepartmentPerformance {
   department_name: string;
   department_code: string;
   total_patents: number;
+  disclosures_count?: number;
   filed_patents: number;
   published_patents: number;
   granted_patents: number;
   pending_patents: number;
+  conversion_ratio?: number;
   success_rate: number;
   innovation_score: number;
 }
@@ -119,11 +122,7 @@ export interface RiskDetail {
   action_items: string[];
 }
 
-export interface ForecastItem {
-  year: number;
-  predicted_filings: number;
-  predicted_grants: number;
-}
+
 
 async function request(path: string, options: RequestInit = {}) {
   const token = localStorage.getItem('token');
@@ -299,9 +298,7 @@ export const api = {
     return request('/api/analytics/faculty-rankings');
   },
 
-  getAIForecast: async (): Promise<ForecastItem[]> => {
-    return request('/api/analytics/ai-forecast');
-  },
+
 
   getAIRisks: async (): Promise<RiskDetail[]> => {
     return request('/api/analytics/ai-risks');

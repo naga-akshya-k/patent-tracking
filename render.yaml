@@ -27,7 +27,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: patent-tracking-backend
-          property: host
+        value: https://patent-tracking-backend.onrender.com

@@ -1,4 +1,22 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+function getBaseUrl(): string {
+  let url = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '').trim();
+  
+  if (url) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+    return url.replace(/\/$/, '');
+  }
+
+  // Auto-detect Render cloud production hostname
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://patent-tracking-backend.onrender.com';
+  }
+
+  return 'http://localhost:8000';
+}
+
+export const API_BASE_URL = getBaseUrl();
 const BASE_URL = API_BASE_URL;
 
 export interface User {

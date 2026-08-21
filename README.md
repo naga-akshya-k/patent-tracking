@@ -1,200 +1,104 @@
-# PatentPulse: AI-Powered Institutional Patent Tracking & Decision Support System
+# 😀 Patent Tracking: Institutional Intellectual Property & Patent Management System
 
-PatentPulse is a comprehensive web application designed for academic institutions to centralize, audit, and forecast their research patent portfolio. It replaces manual spreadsheet tracking with a secure, multi-role platform that automates accreditation compliance (NAAC, NIRF, NBA) and leverages Machine Learning to predict filing growth and flag application processing risks.
+An enterprise-grade Institutional Intellectual Property (IP) and Patent Management System designed for academic institutions and research universities (specifically tailored for institutions like Easwari Engineering College / SRM Group). 
 
----
-
-## ⚙️ System Architecture
-
-PatentPulse uses a decoupled **Client-Server Architecture** designed for high throughput, data integrity, and low maintenance:
-
-```mermaid
-graph TD
-    %% Presentation Layer
-    subgraph Presentation Layer (React SPA)
-        UI[Tailwind UI / Recharts]
-        AC[Auth Context / JWT Store]
-        API[API client - Fetch / CORS]
-    end
-
-    %% Application Layer
-    subgraph Application Layer (FastAPI REST Service)
-        Endpoints[API Route Routers]
-        Auth[JWT / Bcrypt Security]
-        AI[AI Engine - Scikit-Learn]
-    end
-
-    %% Storage Layer
-    subgraph Data & Storage Layer
-        DB[(SQLite File DB)]
-        ORM[SQLAlchemy ORM]
-        FS[Local File Storage /uploads]
-    end
-
-    %% Data Flow Connections
-    UI <--> |Interacts| AC
-    UI --> |REST API Requests| API
-    API <--> |HTTPS / JWT Token| Endpoints
-    Endpoints <--> |User Authenticated| Auth
-    Endpoints <--> |Queries / Commits| ORM
-    ORM <--> |SQLite Query| DB
-    Endpoints --> |Uploads PDF| FS
-    Endpoints <--> |Extracts & Predicts| AI
-```
-
-### 1. Presentation Layer (Frontend)
-*   **Single Page Application (SPA)**: Built using **React** and **TypeScript** (bundled via **Vite**).
-*   **Design System**: Tailwind CSS v3 configured with a high-contrast collegiate color palette, dark/light layouts, interactive hover effects, and modern glassmorphism panels.
-*   **Data Visualization**: Uses **Recharts** to display real-time analytics graphs, including domain distribution pie charts and trend continuation curves.
-
-### 2. Application Layer (Backend)
-*   **RESTful APIs**: Powered by **FastAPI** (Python), delivering automatic JSON validation, query sanitation, and asynchronous request handling.
-*   **Security & RBAC**: Implements secure **JSON Web Tokens (JWT)** with passwords hashed using the **Bcrypt** algorithm to enforce granular Role-Based Access Control (RBAC).
-
-### 3. Intelligence Layer (AI/ML Engine)
-*   **NLP Domain Categorization**: Uses term frequency-inverse document frequency (`TfidfVectorizer`) paired with a multinomial `LogisticRegression` model from `scikit-learn` to automatically classify and suggest research domains.
-*   **Growth Forecaster**: Uses time-series regression to project institutional patent volume (filings and grants) three years into the future.
-*   **Timeline Risk Assessor**: Audits timeline checkpoints and alerts coordinators if responses to government notifications (like the First Examination Report) are overdue.
-
-### 4. Storage & Persistence Layer
-*   **Database**: Local **SQLite** engine, mapped via the **SQLAlchemy ORM** layer. Database schemas are designed for modularity, allowing easy migration to enterprise solutions like PostgreSQL or MySQL.
-*   **Document Management**: Local system folder (`backend/uploads/`) mapped to database file records for draft and certificate tracking.
+It automates the complete IP lifecycle—from student invention disclosures and faculty hearings, up to statutory InPASS prosecution deadline alerts, NIRF/NAAC/NBA accreditation report generation, and commercialization royalty audits.
 
 ---
 
-## 🛠️ Technology Stack
+## 🌐 Live Deployment
 
-### Frontend
-*   **Framework**: React 19
-*   **Language**: TypeScript 5
-*   **Build Tool**: Vite 6
-*   **Styling**: Tailwind CSS 3
-*   **Charts**: Recharts
-*   **Icons**: Lucide React
-
-### Backend
-*   **Framework**: FastAPI (Python 3.10+)
-*   **Database ORM**: SQLAlchemy 2.0
-*   **Encryption**: Passlib (Bcrypt) & PyJWT
-*   **Data Science**: Pandas, NumPy, Scikit-Learn
+| Component | Live URL | Status |
+| :--- | :--- | :--- |
+| **Frontend Web App** | [https://patent-tracking-frontend.onrender.com]https://patent-tracking-frontend.onrender.com) | ✅ Live |
+| **Backend API & Swagger Docs** | [https://patent-tracking-backend.onrender.com/docs](https://patent-tracking-backend.onrender.com/docs) | � Live |
 
 ---
 
-## 📂 Project Structure
+## ⨙ Key Capabilities & Features
 
-```text
-patent-tracking/
-├── backend/
-│   ├── app/
-│   │   ├── ai/               # AI models & risk logic
-│   │   ├── routers/          # FastAPI endpoint handlers
-│   │   ├── config.py         # App configurations & keys
-│   │   ├── database.py       # SQL database initialization
-│   │   ├── main.py           # Core backend launcher
-│   │   ├── models.py         # SQLAlchemy database schemas
-│   │   ├── schemas.py        # Pydantic data schemas
-│   │   └── seed.py           # Preloaded database records
-│   ├── uploads/              # Local storage for patent PDFs
-│   ├── requirements.txt      # Python dependencies
-│   └── patentpulse.db        # SQLite database
-├── frontend/
-│   ├── public/               # Static assets & SVG icons
-│   ├── src/
-│   │   ├── assets/           # Media files & mockups
-│   │   ├── components/       # Reusable UI modules & pages
-│   │   ├── context/          # JWT authentication store
-│   │   ├── services/         # API endpoints fetch client
-│   │   ├── App.tsx           # Router & page layout router
-│   │   └── index.css         # Theme stylesheet
-│   ├── package.json          # Node dependencies
-│   └── tailwind.config.js    # Tailwind configuration
-└── README.md                 # Project documentation
-```
+1. **Full 13-Department Institutional Coverage**: Natively tracks all 13 college engineering departments (`CSE`, `AIADS`, `AIML`, `ECE`, `MECH`, `CHEMICAL`, `BIOTECH`, `IT`, `CYBER`, `CSD`, `CSBS`, `CIVIL`, `EEE`) across a 26-year historical timeline (2000 → 2026).
+2. **InPASS Statutory Legal Alert Center**: Automatically evaluates Indian Patent Office (InPASS) regulations (Indian Patents Act, 1970 & Patent Rules 2024) to trigger statutory warnings:
+   * 🔴 **CRITICAL GER Response Deadline**: 6-Month Section 21 Limit.
+   * 🚠 **WARNING Form 18 RFE (Request for Examination)**: 31-Month Window.
+   * 🚠 **WARNING Stalled Faculty Reviews**: Invention Disclosures pending >14 days.
+   * 👧 **INFO Annual Maintenance / Renewal Fees**: Annuity payments for Granted patents.
+3. **Automated Accreditation Reporting (NIRF, NAAC, NBA)**:
+   * **NIRF Section 3 Rolling Export**: Filings and grants across 3-year rolling windows.
+   * **NAAC Criterion 3.4.3 Data Summary**: Faculty vs. student-led patent awards.
+   * **Departmental IP Audit (13 Depts)**: Comprehensive IP breakdown with *Digital Verification API Badges*.
+   * **Commercialization & Royalty Audit**: Technology transfer licensing valuations.
+4. **Native MS Excel & Print PDF Generation**:
+   * **Excel Export (.xls)**: Generates native Microsoft Excel XML SpreadsheetML format with burgundy-header styling and zero file corruption warnings.
+   * **Print PDF**: Hides UI navbar/sidebars via `@media print` and paginates multi-page documents cleanly for physical signing.
+   * **Audit Archive Log**: Maintains a tamper-proof compliance history for external NAAC/NIRF site inspectors.
+5. **Invention Disclosure Form (IDF) & Bulk Importer**:
+   * Students and Faculty submit new ideas via `post /api/patents`.
+   * Administrators bulk-import legacy college spreadsheets (.csv / .xlsx) into SQLite.
 
 ---
 
-## 🚀 Getting Started & Local Installation
+## 🗛 Technology Stack
 
-### Prerequisites
-*   **Python 3.10** or higher
-*   **Node.js** (v18 or higher) and **npm**
+**Frontend**:
+- Framework: React 19 with TypeScript
+- Build Tool: Vite 6
+- Styling: TailwindCSS 3 (Institutional Burgundy `#6B1D2F` & Navy `#1E293B`)
+- Charts & Visuals: Recharts 3
+- Icons: Lucide-React
 
----
-
-### Step 1: Run the Backend (FastAPI)
-Open a terminal in the root directory:
-
-1. Navigate into the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Create a virtual environment:
-   ```bash
-   python -m venv .venv
-   ```
-3. Activate the virtual environment:
-   *   **Windows (PowerShell)**:
-       ```powershell
-       .venv\Scripts\activate
-       ```
-   *   **macOS / Linux**:
-       ```bash
-       source .venv/bin/activate
-       ```
-4. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-5. Run the server:
-   ```bash
-   uvicorn app.main:app --port 8000
-   ```
-   *The backend will be running at `http://127.0.0.1:8000`.*
+"�*Backend**:
+- Framework: FastAPI (Python 3.10+)
+- ASGI Server: Uvicorn & Gunicorn
+- Database ORM: SQLAlchemy 2.0
+- Security & Auth: JWT (JSON Web Tokens) & Bcrypt Password Hashing
+- Data Science & ML: Scikit-Learn, NumPy, Pandas
+- Database: SQLite (`patentpulse.db`)
 
 ---
 
-### Step 2: Run the Frontend (React / Vite)
-Open a new terminal tab:
+## 🧅 AI / Machine Learning Engine
 
-1. Navigate into the frontend folder:
-   ```bash
-   cd frontend
-   ```
-2. Install npm packages:
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-   *The application will launch on your browser at `http://localhost:5173/`.*
+1. **TF-IDF + Logistic Regression Domain Classifier** (`AICategorizer`):
+   Analyzes the word frequency and token density in patent titles and abstracts to automatically classify new filings into technology domains (*Artificial Intelligence*, *Cybersecurity*, *Healthcare*, *Robotics*, *Electronics*, *Renewable Energy*):
+   $\$\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \log\left(\frac{|D}}{1 + |\{d \in D : t \in d}\|}Yright)$\$
+
+   $\$P(y = c \mid \mathbf{x}) = \frac{e^c^T \mathbf{x}}{\sum_{j_e=j^t \mathbf{x}}$\$
+
+2. **InPASS Statutory Legal Risk Assessor** (`AIRiskAssessor`):
+   Evaluates Statutory Patent Office deadlines, FER 6-month section 21 response periods, Form 18 RFE 31-month windows, and draft document completeness.
 
 ---
 
-## 🔑 Demo Access Roles & Accounts
-The system contains preloaded test data representing different administrative tiers:
+## 🔑 Demm Login Credentials
 
-| Role | Username | Password | Access Rights |
+The project is preloaded with an institutional database spanning all 13 departments:
+
+| Role | Username | Password | Permissions |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@college.edu` | `admin123` | System management, department CRUD, user management. |
-| **Department Coordinator** | `cse.coordinator@college.edu` | `coordinator123` | Patent status transitions, document validation. |
-| **Faculty Inventor** | `prof.sharma@college.edu` | `faculty123` | Patent submission, draft uploads, timeline tracking. |
-| **Auditor / Management** | `auditor@college.edu` | `auditor123` | Read-only analytics dashboard & NAAC/NIRF document exports. |
+| **IP Cell Admin / Super Admin** | `admin` | `admin123` | College-wide IP oversight, bulk-import, accreditation exports |
+| **CSE Department Coordinator** | `cse_coordinator` | `coord123` | Department-specific patent reviews, status transitions |
+| **Management / IQAC Auditor** | `auditor` | `auditor123` | Read-only analytics, NIRF/NAAC/NBA accreditation exports |
+| **Student Innovator** | `student` | `student123` | Invention disclosure submission, draft attachments |
+
+*(You can also use the one-click demo login selector on the login page*)*
 
 ---
 
-## 🧠 AI / Machine Learning Engine Detail
+## 🚪 Local Development Setup
 
-### A. NLP Category Classifier
-The model analyzes the token density in a patent's title and description to predict its domain.
-*   **Feature Vectorizer**: Maps terms to numeric values using a TF-IDF metric:
-    $$\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \log\left(\frac{|D|}{1 + |\{d \in D : t \in d\}|}\right)$$
-*   **Classification Algorithm**: Softmax Logistic Regression assigns probability boundaries over the classes:
-    $$P(y = c \mid \mathbf{x}) = \frac{e^{\mathbf{w}_c^T \mathbf{x}}}{\sum_{j=1}^{C} e^{\mathbf{w}_j^T \mathbf{x}}}$$
+### Backend (FastAPI):
+```bash
+cd backend
+python -m venv .venv
+.source .venv/bin/activate  # On Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000 --reload
+```
 
-### B. Predictive Trend Line
-Fits historical patent counts per year using ordinary least squares to predict future research trajectories.
-*   **Model**: Simple Linear Regression:
-    $$y_i = \beta_0 + \beta_1 x_i + \epsilon_i$$
-    *Where $x_i$ represents the target year, and $y_i$ represents the forecasted count.*
+### Frontend (React + Vite):
+```bash
+cd frontend
+npm install
+npm run dev
+```
